@@ -213,34 +213,20 @@ Analysis of phonetic phenomena specific to Egyptian Arabic (held-out test set):
 
 ## 📂 Repository Structure
 
-The codebase is organized into modular Python source scripts (`src/`), interactive production Jupyter notebooks (`code/`), and the complete IEEE publication assets (`paper/`):
+The repository is organized around self-contained research and execution notebooks in [`code/`](code/):
 
 ```
-Rana/
+ConMamba/
 ├── README.md                           # Master Project README & Documentation
-├── test_fig.tex                        # TikZ standalone source for System Architecture Figure
+├── .gitignore                          # Git Exclusion Rules
 │
-├── code/                               # Interactive Research & Execution Notebooks
-│   ├── README.md                       # Workspace README
-│   ├── phase1.ipynb                    # Notebook 1: Dataset Audit, Headroom Scaling & 16kHz Curation
-│   ├── phase.ipynb                     # Notebook 3: ConMamba vs Conformer Training on SpeechBrain
-│   ├── notebookd5d790028a (1).ipynb     # Dual-T4 Fast Experiment Runner & Missing Baselines
-│   ├── part 3.ipynb                    # Q1 Experiments Suite (Whisper LoRA, Noise Sweep, Table IV)
-│   └── part 4.ipynb                    # Q1 Experiments Suite v2 (Dual-T4 Optimized End-to-End Runner)
-│
-├── src/                                # Standalone Modular Python Production Scripts
-│   ├── README.md                       # Source Documentation
-│   ├── audit_dataset.py                # Standalone Phase 1 Dataset Curation & Audio Resampling Engine
-│   ├── train_egy_q1.py                 # Core SpeechBrain Trainer (ConMamba, Conformer, ConMambaMamba)
-│   ├── ejust_tools.py                  # C++ Kernel Compatibility Shims & YAML Hyperparameter Injector
-│   ├── run_dual_t4_benchmark.py        # Parallel Multi-GPU Job Scheduler & Long-Form Benchmarking
-│   └── requirements.txt                # Pinned Production Python Dependencies
-│
-└── paper/                              # IEEE Transactions on Audio, Speech & Language Processing
-    ├── main.tex                        # Complete LaTeX Manuscript Source
-    ├── main.pdf                        # Compiled 12-page IEEE TASLP Research Article
-    ├── figure1_preview.png             # Rendered Figure 1 Architecture Diagram
-    └── ConMamba_ASR_Overleaf.zip       # Self-contained Overleaf Submission Bundle
+└── code/                               # Interactive Research & Execution Notebooks
+    ├── README.md                       # Workspace Overview
+    ├── phase1.ipynb                    # Notebook 1: Dataset Audit, Headroom Scaling & 16kHz Curation
+    ├── phase.ipynb                     # Notebook 3: ConMamba vs Conformer Training on SpeechBrain
+    ├── notebookd5d790028a (1).ipynb     # Dual-T4 Fast Experiment Runner & Missing Baselines
+    ├── part 3.ipynb                    # Q1 Experiments Suite (Whisper LoRA, Noise Sweep, Table IV)
+    └── part 4.ipynb                    # Q1 Experiments Suite v2 (Dual-T4 Optimized End-to-End Runner)
 ```
 
 ---
@@ -284,24 +270,17 @@ pip install mamba-ssm>=1.2.0 --no-build-isolation
 ```
 
 > [!TIP]
-> **Pre-compiled Wheel Fallback**: If compiling `mamba-ssm` from source fails due to local CUDA version mismatches, you can download matching pre-built wheels from the [mamba-ssm releases](https://github.com/state-spaces/mamba/releases) or use our dynamic C++ compatibility shim embedded in `src/ejust_tools.py`.
+> **Pre-compiled Wheel Fallback**: If compiling `mamba-ssm` from source fails due to local CUDA version mismatches, you can download matching pre-built wheels from the [mamba-ssm releases](https://github.com/state-spaces/mamba/releases).
 
 ---
 
 ## 🚀 Workflow & Reproduction Guide
 
-### Phase 1: Dataset Curation & Audio Resampling
+### Phase 1: Dataset Curation & Audio Resampling (`code/phase1.ipynb`)
 
-The curation pipeline audits 44.1 kHz raw audio, applies episode-level headroom attenuation to eliminate sinc-resampling peak overshoot, verifies speaker identity via ECAPA-TDNN embeddings, and synthesizes continuous long-form sequences.
-
-```bash
-cd src
-export EJUST_INPUT="/path/to/raw/ejust/segments.csv"
-export EJUST_OUT="/path/to/curated/ejust_audit_v1"
-export EJUST_WORKERS=8
-
-python audit_dataset.py
-```
+The curation notebook audits 44.1 kHz raw audio, applies episode-level headroom attenuation to eliminate sinc-resampling peak overshoot, verifies speaker identity via ECAPA-TDNN embeddings, and synthesizes continuous long-form sequences:
+- Open [`code/phase1.ipynb`](code/phase1.ipynb) in Jupyter, Kaggle, or Colab.
+- Configure input dataset path and run all cells.
 
 **Key outputs generated:**
 - `wav16k/`: 16 kHz 16-bit PCM single-channel WAV files with zero clipped samples.
@@ -311,19 +290,11 @@ python audit_dataset.py
 
 ---
 
-### Phase 2: Model Training
+### Phase 2: Model Training (`code/phase.ipynb`)
 
 Train the **ConMamba-Small** architecture using SpeechBrain with joint CTC/Attention loss:
-
-```bash
-python train_egy_q1.py /path/to/conmamba_small.yaml \
-    --data_folder=/path/to/curated/ejust_audit_v1 \
-    --output_folder=./results/conmamba_small_s7775 \
-    --precision=fp16 \
-    --seed=7775 \
-    --batch_size=32 \
-    --number_of_epochs=110
-```
+- Open [`code/phase.ipynb`](code/phase.ipynb).
+- Set `MODEL = "conmamba_small"` and execute the convergence run across 110 epochs.
 
 **Training Highlights:**
 - **Optimizer**: AdamW ($\beta_1=0.9, \beta_2=0.98, \epsilon=10^{-8}$)
@@ -333,14 +304,11 @@ python train_egy_q1.py /path/to/conmamba_small.yaml \
 
 ---
 
-### Phase 3: Multi-GPU Evaluation & Benchmarking
+### Phase 3: Multi-GPU Evaluation & Benchmarking (`code/part 4.ipynb`)
 
 To reproduce all tables (Table I through Table VII) in parallel across a dual-GPU system (such as Kaggle Dual-T4):
-
-```bash
-# Runs baselines, Whisper-LoRA, long-form chunking ablation, and latency scaling:
-python run_dual_t4_benchmark.py
-```
+- Open and run [`code/part 4.ipynb`](code/part 4.ipynb) directly in Kaggle (GPU T4 $\times$ 2) or Colab.
+- Executes ConMamba, Conformer, Whisper-LoRA, noise sweeps, long-form chunking ablations, and generates IEEE TASLP LaTeX tables automatically.
 
 Or open and run `code/part 4.ipynb` directly in Kaggle or Google Colab with GPU acceleration enabled.
 

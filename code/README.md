@@ -44,9 +44,9 @@ Colloquial Arabic automatic speech recognition (ASR) poses formidable challenges
 - [Repository Structure](#-repository-structure)
 - [Installation & Environment Setup](#-installation--environment-setup)
 - [Workflow & Reproduction Guide](#-workflow--reproduction-guide)
-  - [Phase 1: Dataset Curation & Audio Resampling](#phase-1-dataset-curation--audio-resampling)
-  - [Phase 2: Model Training](#phase-2-model-training)
-  - [Phase 3: Multi-GPU Evaluation & Benchmarking](#phase-3-multi-gpu-evaluation--benchmarking)
+  - [Phase 1: Dataset Curation & Audio Resampling](#phase-1-dataset-curation--audio-resampling-codephase1ipynb)
+  - [Phase 2: Model Training](#phase-2-model-training-codephaseipynb)
+  - [Phase 3: Multi-GPU Evaluation & Benchmarking](#phase-3-multi-gpu-evaluation--benchmarking-codepart-4ipynb)
 - [Interactive Python Inference API](#-interactive-python-inference-api)
 - [Egyptian Arabic Linguistic Normalization](#-egyptian-arabic-linguistic-normalization)
 - [Citation & Reference](#-citation--reference)
@@ -193,8 +193,6 @@ ConMamba-Small   ███████ 37.4 ms  (-37.7% Forward Latency)
 | w/o Depthwise Conv (Pure BiMamba) | 12.1M | 14.04 | 4.56 | 15.58 | +0.19% |
 | w/o CTC Loss ($\alpha=0.0$, Pure Autoregressive S2S) | 12.1M | 251.00* | 264.00* | 282.00* | Diverged |
 
-*\*Note: Training without auxiliary CTC loss completely fails to establish monotonic speech-text alignments under low-resource dialectal conditions.*
-
 ---
 
 ### 5. Dialectal Phonetic Error Breakdown
@@ -213,34 +211,20 @@ Analysis of phonetic phenomena specific to Egyptian Arabic (held-out test set):
 
 ## 📂 Repository Structure
 
-The codebase is organized into modular Python source scripts (`src/`), interactive production Jupyter notebooks (`code/`), and the complete IEEE publication assets (`paper/`):
+The repository is organized around self-contained research and execution notebooks in [`code/`](code/):
 
 ```
-Rana/
+ConMamba/
 ├── README.md                           # Master Project README & Documentation
-├── test_fig.tex                        # TikZ standalone source for System Architecture Figure
+├── .gitignore                          # Git Exclusion Rules
 │
-├── code/                               # Interactive Research & Execution Notebooks
-│   ├── README.md                       # Workspace README
-│   ├── phase1.ipynb                    # Notebook 1: Dataset Audit, Headroom Scaling & 16kHz Curation
-│   ├── phase.ipynb                     # Notebook 3: ConMamba vs Conformer Training on SpeechBrain
-│   ├── notebookd5d790028a (1).ipynb     # Dual-T4 Fast Experiment Runner & Missing Baselines
-│   ├── part 3.ipynb                    # Q1 Experiments Suite (Whisper LoRA, Noise Sweep, Table IV)
-│   └── part 4.ipynb                    # Q1 Experiments Suite v2 (Dual-T4 Optimized End-to-End Runner)
-│
-├── src/                                # Standalone Modular Python Production Scripts
-│   ├── README.md                       # Source Documentation
-│   ├── audit_dataset.py                # Standalone Phase 1 Dataset Curation & Audio Resampling Engine
-│   ├── train_egy_q1.py                 # Core SpeechBrain Trainer (ConMamba, Conformer, ConMambaMamba)
-│   ├── ejust_tools.py                  # C++ Kernel Compatibility Shims & YAML Hyperparameter Injector
-│   ├── run_dual_t4_benchmark.py        # Parallel Multi-GPU Job Scheduler & Long-Form Benchmarking
-│   └── requirements.txt                # Pinned Production Python Dependencies
-│
-└── paper/                              # IEEE Transactions on Audio, Speech & Language Processing
-    ├── main.tex                        # Complete LaTeX Manuscript Source
-    ├── main.pdf                        # Compiled 12-page IEEE TASLP Research Article
-    ├── figure1_preview.png             # Rendered Figure 1 Architecture Diagram
-    └── ConMamba_ASR_Overleaf.zip       # Self-contained Overleaf Submission Bundle
+└── code/                               # Interactive Research & Execution Notebooks
+    ├── README.md                       # Workspace Overview
+    ├── phase1.ipynb                    # Notebook 1: Dataset Audit, Headroom Scaling & 16kHz Curation
+    ├── phase.ipynb                     # Notebook 3: ConMamba vs Conformer Training on SpeechBrain
+    ├── notebookd5d790028a (1).ipynb     # Dual-T4 Fast Experiment Runner & Missing Baselines
+    ├── part 3.ipynb                    # Q1 Experiments Suite (Whisper LoRA, Noise Sweep, Table IV)
+    └── part 4.ipynb                    # Q1 Experiments Suite v2 (Dual-T4 Optimized End-to-End Runner)
 ```
 
 ---
@@ -257,8 +241,8 @@ Rana/
 ### Step 1: Clone Repository & Create Environment
 
 ```bash
-git clone https://github.com/your-username/ConMamba-ASR.git
-cd ConMamba-ASR
+git clone https://github.com/MoMassEg/ConMamba.git
+cd ConMamba
 python -m venv venv
 source venv/bin/activate  # On Windows: .\venv\Scripts\Activate.ps1
 ```
@@ -284,24 +268,17 @@ pip install mamba-ssm>=1.2.0 --no-build-isolation
 ```
 
 > [!TIP]
-> **Pre-compiled Wheel Fallback**: If compiling `mamba-ssm` from source fails due to local CUDA version mismatches, you can download matching pre-built wheels from the [mamba-ssm releases](https://github.com/state-spaces/mamba/releases) or use our dynamic C++ compatibility shim embedded in `src/ejust_tools.py`.
+> **Pre-compiled Wheel Fallback**: If compiling `mamba-ssm` from source fails due to local CUDA version mismatches, you can download matching pre-built wheels from the [mamba-ssm releases](https://github.com/state-spaces/mamba/releases).
 
 ---
 
 ## 🚀 Workflow & Reproduction Guide
 
-### Phase 1: Dataset Curation & Audio Resampling
+### Phase 1: Dataset Curation & Audio Resampling (`code/phase1.ipynb`)
 
-The curation pipeline audits 44.1 kHz raw audio, applies episode-level headroom attenuation to eliminate sinc-resampling peak overshoot, verifies speaker identity via ECAPA-TDNN embeddings, and synthesizes continuous long-form sequences.
-
-```bash
-cd src
-export EJUST_INPUT="/path/to/raw/ejust/segments.csv"
-export EJUST_OUT="/path/to/curated/ejust_audit_v1"
-export EJUST_WORKERS=8
-
-python audit_dataset.py
-```
+The curation notebook audits 44.1 kHz raw audio, applies episode-level headroom attenuation to eliminate sinc-resampling peak overshoot, verifies speaker identity via ECAPA-TDNN embeddings, and synthesizes continuous long-form sequences:
+- Open [`code/phase1.ipynb`](code/phase1.ipynb) in Jupyter, Kaggle, or Colab.
+- Configure input dataset path and run all cells.
 
 **Key outputs generated:**
 - `wav16k/`: 16 kHz 16-bit PCM single-channel WAV files with zero clipped samples.
@@ -311,19 +288,11 @@ python audit_dataset.py
 
 ---
 
-### Phase 2: Model Training
+### Phase 2: Model Training (`code/phase.ipynb`)
 
 Train the **ConMamba-Small** architecture using SpeechBrain with joint CTC/Attention loss:
-
-```bash
-python train_egy_q1.py /path/to/conmamba_small.yaml \
-    --data_folder=/path/to/curated/ejust_audit_v1 \
-    --output_folder=./results/conmamba_small_s7775 \
-    --precision=fp16 \
-    --seed=7775 \
-    --batch_size=32 \
-    --number_of_epochs=110
-```
+- Open [`code/phase.ipynb`](code/phase.ipynb).
+- Set `MODEL = "conmamba_small"` and execute the convergence run across 110 epochs.
 
 **Training Highlights:**
 - **Optimizer**: AdamW ($\beta_1=0.9, \beta_2=0.98, \epsilon=10^{-8}$)
@@ -333,16 +302,11 @@ python train_egy_q1.py /path/to/conmamba_small.yaml \
 
 ---
 
-### Phase 3: Multi-GPU Evaluation & Benchmarking
+### Phase 3: Multi-GPU Evaluation & Benchmarking (`code/part 4.ipynb`)
 
 To reproduce all tables (Table I through Table VII) in parallel across a dual-GPU system (such as Kaggle Dual-T4):
-
-```bash
-# Runs baselines, Whisper-LoRA, long-form chunking ablation, and latency scaling:
-python run_dual_t4_benchmark.py
-```
-
-Or open and run `code/part 4.ipynb` directly in Kaggle or Google Colab with GPU acceleration enabled.
+- Open and run [`code/part 4.ipynb`](code/part 4.ipynb) directly in Kaggle (GPU T4 $\times$ 2) or Colab.
+- Executes ConMamba, Conformer, Whisper-LoRA, noise sweeps, long-form chunking ablations, and generates IEEE TASLP LaTeX tables automatically.
 
 ---
 
@@ -360,7 +324,6 @@ from speechbrain.inference.interfaces import Pretrained
 class ConMambaInference:
     def __init__(self, checkpoint_dir: str, device: str = "cuda" if torch.cuda.is_available() else "cpu"):
         self.device = device
-        # Load hyperparams and modules via SpeechBrain / HyperPyYAML
         from hyperpyyaml import load_hyperpyyaml
         with open(f"{checkpoint_dir}/hyperparams.yaml") as f:
             self.hparams = load_hyperpyyaml(f)
@@ -380,21 +343,14 @@ class ConMambaInference:
             sr = 16000
             
         wav = torch.from_numpy(sig).float().unsqueeze(0).to(self.device)
-        
-        # Split into energy/silence-aware chunks
         chunks = self._chunk_audio(wav, sr, max_chunk_sec, energy_thresh)
         transcriptions = []
         
         with torch.no_grad():
             for chunk in chunks:
-                # Compute 80-dim Log-Mel Spectrogram
                 feats = self.hparams["compute_features"](chunk)
                 feats = self.hparams["normalize"](feats, torch.tensor([1.0]).to(self.device))
-                
-                # Forward through ConMamba Encoder
                 enc_out = self.model.encoder(feats)
-                
-                # Beam search decoding with Transformer cross-attention + CTC
                 predicted_tokens, _, _, _ = self.hparams["test_search"](
                     enc_out, torch.tensor([1.0]).to(self.device)
                 )
@@ -428,11 +384,6 @@ class ConMambaInference:
             chunks.append(wav[:, start:split])
             start = split
         return chunks
-
-# Example Usage:
-# asr = ConMambaInference(checkpoint_dir="./results/conmamba_small_s7775")
-# text = asr.transcribe_file("sample_egyptian_dialect.wav")
-# print("Transcription:", text)
 ```
 
 ---

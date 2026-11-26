@@ -12,7 +12,12 @@ __pycache__/
 paper/tools/
 *.ppm
 
-# LaTeX intermediate build artifacts (keep main.pdf)
+# Excluded folders & standalone TeX
+paper/
+src/
+test_fig.tex
+
+# LaTeX intermediate build artifacts
 *.aux
 *.bbl
 *.blg
@@ -27,7 +32,6 @@ paper/tools/
 *.bak
 *.pre_fig1
 *.pre_q1_fixes
-paper/temp_*.*
 
 # Checkpoints, models, large outputs
 checkpoints/
