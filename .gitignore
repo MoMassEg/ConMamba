@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Large binaries and tools
+*.so
+*.dylib
+*.dll
+*.exe
+paper/tools/
+*.ppm
+
+# LaTeX intermediate build artifacts (keep main.pdf)
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Backup and temporary probe files
+*.bak
+*.pre_fig1
+*.pre_q1_fixes
+paper/temp_*.*
+
+# Checkpoints, models, large outputs
+checkpoints/
+results/
+*.pt
+*.pth
+*.ckpt
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+env/
+.env/
+
+# OS generated files
+.DS_Store
+Thumbs.db
