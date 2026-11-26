@@ -421,14 +421,13 @@ If you find this codebase, benchmark, or paper helpful in your research, please 
 
 ## 👥 Contributors & Contact
 
-- **Rana Z. Dighedy** — *Electronics & Communications Engineering Dept., E-JUST* (`rana.abdallah@ejust.edu.eg`)
-- **Mohamed S. Amer** — *Electronics & Communications Engineering Dept., E-JUST* (`mohamed.320230188@ejust.edu.eg`)
-- **Monay M. Gad** — *Electronics & Communications Engineering Dept., E-JUST* (`monay.320230097@ejust.edu.eg`)
-- **Manal M. Ghaith** — *Electronics & Communications Engineering Dept., E-JUST* (`manal.320230164@ejust.edu.eg`)
-- **Ahmed B. Zaky** — *Electronics & Communications Engineering Dept., E-JUST* (`ahmed.zaky@ejust.edu.eg`)
+- **Rana Z. Dighedy** — *E-JUST* (`rana.abdallah@ejust.edu.eg`)
+- **Mohamed S. Amer** — *E-JUST* (`mohamed.320230188@ejust.edu.eg`)
+- **Monay M. Gad** — *E-JUST* (`monay.320230097@ejust.edu.eg`)
+- **Manal M. Ghaith** — *E-JUST* (`manal.320230164@ejust.edu.eg`)
+- **Ahmed B. Zaky** — *E-JUST* (`ahmed.zaky@ejust.edu.eg`)
 
 **Affiliation**:  
-Department of Electronics and Communications Engineering,  
 Egypt-Japan University of Science and Technology (E-JUST),  
 New Borg El-Arab City, Alexandria 21934, Egypt.
 
